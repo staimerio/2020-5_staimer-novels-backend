@@ -1,0 +1,16 @@
+# Virtual Environment
+venv
+
+#Environment
+.env.development
+.env.production
+.env.test
+
+#IDE
+.vscode
+*__pycache__
+
+#Deploy
+passenger_wsgi.py
+
+#App
