@@ -26,6 +26,7 @@ from models import Novel, Chapter, NovelPost
 # Constants
 NOVEL_CHAPTERS_LIMIT = app.config.get('NOVEL_CHAPTERS_LIMIT', callback=int)
 COVER_DOUBLE_TITLE = app.config.get('COVER_DOUBLE_TITLE', callback=int)
+NOVEL_DESCRIPTION_UPLOAD = app.config.get('NOVEL_DESCRIPTION_UPLOAD')
 LANG_EN = {
     'name': 'english',
     'slug': 'novel-updates',
@@ -275,7 +276,8 @@ def search_novel(title, books):
 def upload_to_storage(novels):
     """Upload files to storage
 
-    :param novels: List of novel that you want to save into to storage"""
+    :param novels: List of novel that you want to save into to storage
+    """
 
     """Define all variables"""
     _uploaded_novels = []
@@ -293,7 +295,8 @@ def upload_to_storage(novels):
         )
         """Upload files"""
         _uploaded_files = sendfiles.upload_files(
-            _files_to_upload
+            _files_to_upload,
+            NOVEL_DESCRIPTION_UPLOAD
         )
         """Set direct download links in none"""
         _novel['epub_storage'] = _novel['pdf_storage'] = None

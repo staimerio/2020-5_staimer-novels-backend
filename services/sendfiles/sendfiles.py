@@ -12,16 +12,18 @@ URL_FILES = app.apps['backend']['sendfiles']['base_url'] + \
     app.apps['backend']['sendfiles']['files']
 
 
-def upload_files(files):
+def upload_files(files, description):
     """Upload a list of files to storage
 
     :param files: List of files to upload
+    :param description: Description of the upload
     """
 
     """Build epub file"""
     _files = requests.post(
         URL_FILES,
-        files=files
+        files=files,
+        description=description
     )
     """Check if the response is valid"""
     if _files.status_code != 200:
