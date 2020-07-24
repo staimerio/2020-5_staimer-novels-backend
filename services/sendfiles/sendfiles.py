@@ -19,11 +19,16 @@ def upload_files(files, description):
     :param description: Description of the upload
     """
 
+    """Prepare the payload"""
+    _payload = {
+        u"description": description
+    }
+
     """Build epub file"""
     _files = requests.post(
         URL_FILES,
         files=files,
-        description=description
+        data=_payload
     )
     """Check if the response is valid"""
     if _files.status_code != 200:
