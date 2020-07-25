@@ -296,7 +296,7 @@ def upload_to_storage(novels):
         """Upload files"""
         _uploaded_files = sendfiles.upload_files(
             _files_to_upload,
-            NOVEL_DESCRIPTION_UPLOAD
+            NOVEL_DESCRIPTION_UPLOAD.format(_novel['author'])
         )
         """Set direct download links in none"""
         _novel['epub_storage'] = _novel['pdf_storage'] = None
