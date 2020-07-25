@@ -35,7 +35,7 @@ def build_epub_from_html(filename, cover, sections, binary_response=False):
     """Check if the response is valid"""
     if _book.status_code != 200:
         """Return error if the response is invalid"""
-        raise Exception("Invalid request.")
+        raise Exception(_book.text)
     """Get json response"""
     _book_json = _book.json()
     """Return data"""

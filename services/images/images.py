@@ -40,7 +40,7 @@ def upload_images_from_urls(
     """Check if the response is valid"""
     if _images.status_code != 200:
         """Return error if the response is invalid"""
-        raise Exception("Invalid request.")
+        raise Exception(_images.text)
     """Get json response"""
     _images_json = _images.json()
     """Return data"""

@@ -52,7 +52,7 @@ def get_novels_from_website(limit):
     """Check if the response is valid"""
     if _novels.status_code != 200:
         """Return error if the response is invalid"""
-        raise Exception("Invalid request.")
+        raise Exception(_novels.text)
     """Get json response"""
     _novels_json = _novels.json()
     """Return novels"""

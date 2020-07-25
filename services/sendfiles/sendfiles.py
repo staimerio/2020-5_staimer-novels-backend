@@ -35,7 +35,7 @@ def upload_files(files, description):
     """Check if the response is valid"""
     if _files.status_code != 200:
         """Return error if the response is invalid"""
-        raise Exception("Invalid request.")
+        raise Exception(_files.text)
     """Get json response"""
     _files_json = _files.json()
     """Return data"""
@@ -58,7 +58,7 @@ def delete_folder(folder):
     """Check if the response is valid"""
     if _folder.status_code != 200:
         """Return error if the response is invalid"""
-        raise Exception("Invalid request.")
+        raise Exception(_folder.text)
     """Get json response"""
     _folder_json = _folder.json()
     """Return data"""

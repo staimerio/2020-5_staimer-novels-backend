@@ -37,7 +37,7 @@ def build_pdfs_from_epub(filename, files, binary_response=False):
     """Check if the response is valid"""
     if _files.status_code != 200:
         """Return error if the response is invalid"""
-        raise Exception("Invalid request.")
+        raise Exception(_files.text)
     """Get json response"""
     _files_json = _files.json()
     """Return data"""
