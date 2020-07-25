@@ -347,6 +347,8 @@ def publish_novels(novels):
         if 'post' in _novel and _novel['post']:
             """Get post by id"""
             _oldpost = lnpdf.get_post(_novel['post'])
+            """Get old storage folder"""
+            _old_storage_folder = _oldpost['data']['meta']['storage_folder']
             """Set metadata about the post"""
             _oldpost['data']['meta']['storage_data'] = _storage
             _oldpost['data']['meta']['storage_folder'] = _novel['code']
@@ -358,6 +360,10 @@ def publish_novels(novels):
             )
             """Check if is a valid post"""
             if _post and _post['valid']:
+                """Delete old folder"""
+                _deleted_folder = sendfiles.delete_folder(
+                    _old_storage_folder
+                )
                 """Add post to the list"""
                 _published_novels.append(_post['data'])
         else:

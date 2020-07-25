@@ -22,6 +22,7 @@ BACKEND_PDF = {
 BACKEND_SENDFILES = {
     u"base_url": app.config.get('APP_BACKEND_SENDFILES'),
     u"files": "/files",
+    u"folders": "/folders",
 }
 
 BACKEND_LNPDF = {
