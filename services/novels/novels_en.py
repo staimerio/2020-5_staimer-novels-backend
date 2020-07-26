@@ -63,6 +63,7 @@ def get_novels_from_website(limit):
 def get_chapters_by_novels(novels, limit=NOVEL_CHAPTERS_LIMIT):
     """Define all variables"""
     _novel_chapters_ids = []
+    _novels_chapters = []
     """For each novel do the following"""
     for _novel in novels:
         """Find novel in db"""
@@ -85,6 +86,9 @@ def get_chapters_by_novels(novels, limit=NOVEL_CHAPTERS_LIMIT):
             _novel_chapters_ids,
             limit
         )
+        """Check if it has any problem"""
+        if not _novel_chapters:
+            continue
         """Add chapters to novel"""
         _novel['chapters'] = _novel_chapters.get('chapters')
         _novel['oldchapters'] = _novel_chapters_db
@@ -92,7 +96,9 @@ def get_chapters_by_novels(novels, limit=NOVEL_CHAPTERS_LIMIT):
         _novel['info'] = _novel_chapters.get('novel')
         """The novel exists?"""
         _novel['db'] = _novel_db['data'] if _novel_db['valid'] is True else None
-    return novels
+        """Add novel to list"""
+        _novels_chapters.append(_novel)
+    return _novels_chapters
 
 
 def get_by_slug_db(slug):
@@ -284,9 +290,9 @@ def upload_to_storage(novels):
 
     """Define all variables"""
     _uploaded_novels = []
-    _files_to_upload = []
     """For each novel do the following"""
     for _novel in novels:
+        _files_to_upload = []
         """Create list to upload"""
         """Add the epub file"""
         _files_to_upload.append(
