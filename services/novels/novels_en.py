@@ -3,6 +3,7 @@
 # Retic
 from retic import env, App as app
 
+
 # Requests
 import requests
 
@@ -195,6 +196,9 @@ def build_all_novels_to_epub(novels, binary_response):
     _epub_novels = []
     """For each novel do the following"""
     for _novel in novels:
+        """Check if has new chapters"""
+        if not _novel['chapters']:
+            continue
         """Add oldchapters to new chapters"""
         _novel['chapters'] = _novel['oldchapters']+_novel['chapters']
         """Build cover in HTML"""
@@ -237,10 +241,9 @@ def build_all_epub_to_pdf(books, binary_response):
     for _book in books:
         """Get bytes file"""
         _pdf_books_files.append(
-            ('files', (_book['epub_binary']))
+            ('files', (_book['title'], _book['epub_binary']))
         )
     _build_files = pdf.build_pdfs_from_epub(
-        _book['title'],
         _pdf_books_files,
         binary_response
     )

@@ -22,7 +22,7 @@ def build_pdfs_from_epub(filename, files, binary_response=False):
 
     """Prepare the payload"""
     _payload = {
-        u"filename": filename,
+        
     }
     _params = {
         u"binary_response": binary_response
