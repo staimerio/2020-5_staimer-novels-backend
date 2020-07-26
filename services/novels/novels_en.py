@@ -35,6 +35,7 @@ LANG_EN = {
     'categories': "240",
     'href': 'en',
 }
+NOVEL_PREFIX_CH_EN = app.config.get('NOVEL_PREFIX_CH_EN')
 URL_NOVELS_LATEST = app.apps['backend']['mtlnovel']['base_url'] + \
     app.apps['backend']['mtlnovel']['novels_latest']
 URL_NOVELS_CHAPTERS = app.apps['backend']['mtlnovel']['base_url'] + \
@@ -214,6 +215,7 @@ def build_all_novels_to_epub(novels, binary_response):
             _novel['title'],
             _cover,
             [_novel],
+            NOVEL_PREFIX_CH_EN,
             binary_response
         )
         """Check if the response has any problem"""

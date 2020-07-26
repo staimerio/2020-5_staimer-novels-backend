@@ -20,7 +20,7 @@ def get_chapters_from_website(url, slug_novel, chaptersIds, limit):
     """Check if the response is valid"""
     if _chapters.status_code != 200:
         """Return error if the response is invalid"""
-        raise None
+        return None
     """Get json response"""
     _chapters_json = _chapters.json()
     """Return chapters"""

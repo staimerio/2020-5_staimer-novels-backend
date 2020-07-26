@@ -23,7 +23,7 @@ def publish_latest(req: Request, res: Response, next: Next):
     )
     """Check if it hasn't novels, response to client"""
     if not _novels_chapters:
-        res.ok(
+        return res.ok(
             error_response_service(
                 msg="New novels not found."
             )
@@ -34,7 +34,7 @@ def publish_latest(req: Request, res: Response, next: Next):
 
     """Check if it hasn't novels, response to client"""
     if not _chapters_db['data']['novels']:
-        res.ok(
+        return res.ok(
             error_response_service(
                 msg="All novels are updated."
             )
@@ -49,7 +49,7 @@ def publish_latest(req: Request, res: Response, next: Next):
 
     """Check if it hasn't novels, response to client"""
     if not _build_epub_books:
-        res.ok(
+        return res.ok(
             error_response_service(
                 msg="All books are updated."
             )
