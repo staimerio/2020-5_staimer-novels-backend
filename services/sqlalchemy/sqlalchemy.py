@@ -46,9 +46,16 @@ def config_sqlalchemy():
     """delete all models and create all models again
     https://docs.sqlalchemy.org/en/13/core/metadata.html
     """
-    # Base.metadata.drop_all(_engine)
-    # Base.metadata.create_all(_engine)
+
+    """"Initialize all database"""
+    # initialize(_engine)
 
     """Define the session"""
     _sessionmaker = sessionmaker(_engine)
     return _sessionmaker
+
+
+def initialize(engine):
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    

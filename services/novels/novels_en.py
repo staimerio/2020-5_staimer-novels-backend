@@ -15,6 +15,7 @@ from retic.services.responses import success_response_service, error_response_se
 import services.novels.chapters as chapters
 import services.epub.epub as epub
 import services.pdf.pdf as pdf
+import services.mobi.mobi as mobi
 import services.sendfiles.sendfiles as sendfiles
 import services.lnpdf.lnpdf as lnpdf
 import services.images.images as images
@@ -44,10 +45,11 @@ WEBSITE_URL_COVER = app.config.get('WEBSITE_URL_COVER')
 WEBSITE_TITLE_COVER = app.config.get('WEBSITE_TITLE_COVER')
 
 
-def get_novels_from_website(limit):
+def get_novels_from_website(limit, pages):
     """Prepare the payload"""
     _payload = {
-        u"limit": limit
+        u"limit": limit,
+        u"pages": pages
     }
     """Get all novels from website"""
     _novels = requests.get(URL_NOVELS_LATEST, params=_payload)
@@ -61,7 +63,7 @@ def get_novels_from_website(limit):
     return _novels_json.get('data')
 
 
-def get_chapters_by_novels(novels, limit=NOVEL_CHAPTERS_LIMIT):
+def get_chapters_by_novels(novels, limit_publish, limit=NOVEL_CHAPTERS_LIMIT):
     """Define all variables"""
     _novel_chapters_ids = []
     _novels_chapters = []
@@ -99,6 +101,9 @@ def get_chapters_by_novels(novels, limit=NOVEL_CHAPTERS_LIMIT):
         _novel['db'] = _novel_db['data'] if _novel_db['valid'] is True else None
         """Add novel to list"""
         _novels_chapters.append(_novel)
+        """Check if is the max"""
+        if len(_novels_chapters) >= limit_publish:
+            break
     return _novels_chapters
 
 
@@ -131,7 +136,7 @@ def get_by_slug_db(slug):
     )
 
 
-def save_novels_db(novels):
+def save_novels_db(novels, language):
     """Define all variables"""
     _novels = []
     """For each novel do the following"""
@@ -150,7 +155,8 @@ def save_novels_db(novels):
                 year=_novel['year'],
                 title=_novel['title'],
                 slug=_novel['slug'],
-                site=_novel['site']
+                site=_novel['site'],
+                language=language,
             )
             _session.add(_novel_db)
             _session.flush()
@@ -276,6 +282,47 @@ def build_all_epub_to_pdf(books, binary_response):
     return _pdf_books
 
 
+def build_all_epub_to_mobi(books, binary_response):
+    """Build all books to epub files
+
+    :param books: List of epubs that you want to build to pdf
+    :param binary_response: Flag that assign if the response will has a binary file
+    """
+
+    """Define all variables"""
+    _mobi_books = []
+    _mobi_books_files = []
+    """For each novel do the following"""
+    for _book in books:
+        """Get bytes file"""
+        _mobi_books_files.append(
+            ('files', (_book['title'], _book['epub_binary']))
+        )
+    _build_files = mobi.build_mobi_from_epub(
+        _mobi_books_files,
+        binary_response
+    )
+    """Check if the response has any problem"""
+    if _build_files['valid'] is False:
+        return _build_files
+    """For each file get his bytes format"""
+    for _build_file in _build_files['data']['files']:
+        """Get binary from the file"""
+        _fbinary = binascii.a2b_base64(
+            _build_file['mobi']['mobi_b64']
+        )
+        """Search novel in the list"""
+        _novel = search_novel(_build_file['mobi']['title'], books)
+        """Add the novel to response list"""
+        _mobi_books.append({
+            **_novel,
+            **_build_file['mobi'],
+            u"mobi_binary": _fbinary
+        })
+    """Return data"""
+    return _mobi_books
+
+
 def search_novel(title, books):
     """Search novel in the list"""
     for _book in books:
@@ -304,19 +351,27 @@ def upload_to_storage(novels):
         _files_to_upload.append(
             ('files', (_novel['pdf_title'], _novel['pdf_binary']))
         )
+        """Add the mobi file"""
+        _files_to_upload.append(
+            ('files', (_novel['mobi_title'], _novel['mobi_binary']))
+        )
         """Upload files"""
         _uploaded_files = sendfiles.upload_files(
             _files_to_upload,
             NOVEL_DESCRIPTION_UPLOAD.format(_novel['author'])
         )
         """Set direct download links in none"""
-        _novel['epub_storage'] = _novel['pdf_storage'] = None
+        _novel['epub_storage'] = \
+            _novel['pdf_storage'] = \
+            _novel['mobi_storage'] = None
         """Set direct download link to files"""
         for _upload in _uploaded_files['data']['success']:
             if _upload['extension'] == 'epub':
                 _novel['epub_storage'] = _upload['code']
             elif _upload['extension'] == 'pdf':
                 _novel['pdf_storage'] = _upload['code']
+            elif _upload['extension'] == 'mobi':
+                _novel['mobi_storage'] = _upload['code']
         """Check if the response has any problem"""
         if _uploaded_files['valid'] is True:
             _uploaded_novels.append({
@@ -338,21 +393,29 @@ def publish_novels(novels):
     _published_novels = []
     """For each novels do to the following"""
     for _novel in novels:
-        """Add pdf version"""
+        """Add epub version"""
         _storage = "{0},{1},{2},{3},{4}\n".format(
+            _novel['lang'],
+            'epub',
+            get_mb_from_bytes_round(_novel['epub_size'], 2),
+            _novel['epub_storage'],
+            _novel['epub_title'],
+        )
+        """Add pdf version"""
+        _storage += "{0},{1},{2},{3},{4}\n".format(
             _novel['lang'],
             'pdf',
             get_mb_from_bytes_round(_novel['pdf_size'], 2),
             _novel['pdf_storage'],
             _novel['pdf_title'],
         )
-        """Add epub version"""
+        """Add mobi version"""
         _storage += "{0},{1},{2},{3},{4}".format(
             _novel['lang'],
-            'epub',
-            get_mb_from_bytes_round(_novel['epub_size'], 2),
-            _novel['epub_storage'],
-            _novel['epub_title'],
+            'mobi',
+            get_mb_from_bytes_round(_novel['mobi_size'], 2),
+            _novel['mobi_storage'],
+            _novel['mobi_title'],
         )
         """If the post exists, update the posts"""
         if 'post' in _novel and _novel['post']:

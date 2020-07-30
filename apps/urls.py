@@ -19,6 +19,11 @@ BACKEND_PDF = {
     u"build_from_epub": "/build/from-epub",
 }
 
+BACKEND_MOBI = {
+    u"base_url": app.config.get('APP_BACKEND_MOBI'),
+    u"build_from_epub": "/build/from-epub",
+}
+
 BACKEND_SENDFILES = {
     u"base_url": app.config.get('APP_BACKEND_SENDFILES'),
     u"files": "/files",
@@ -39,6 +44,7 @@ APP_BACKEND = {
     u"mtlnovel": BACKEND_MTLNOVEL,
     u"epub": BACKEND_EPUB,
     u"pdf": BACKEND_PDF,
+    u"mobi": BACKEND_MOBI,
     u"sendfiles": BACKEND_SENDFILES,
     u"lnpdf": BACKEND_LNPDF,
     u"images": BACKEND_IMAGES

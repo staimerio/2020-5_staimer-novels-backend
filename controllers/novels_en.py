@@ -10,16 +10,24 @@ from retic.services.responses import success_response_service, error_response_se
 
 # Constants
 WEBSITE_LIMIT_LATEST = app.config.get('WEBSITE_LIMIT_LATEST', callback=int)
+WEBSITE_PAGES_LATEST = app.config.get('WEBSITE_PAGES_LATEST', callback=int)
+WEBSITE_LIMIT_PUBLISH_LATEST = app.config.get(
+    'WEBSITE_LIMIT_PUBLISH_LATEST', callback=int)
+NOVEL_LANGUAGE_ID = app.config.get(
+    'NOVEL_LANGUAGE_ID', callback=int)
 
 
 def publish_latest(req: Request, res: Response, next: Next):
     """Get novels from website"""
     _novels = novels_en.get_novels_from_website(
-        limit=req.param('limit', WEBSITE_LIMIT_LATEST, int)
+        limit=req.param('limit', WEBSITE_LIMIT_LATEST, int),
+        pages=req.param('pages', WEBSITE_PAGES_LATEST, int)
     )
     """Get chapters from all novels"""
     _novels_chapters = novels_en.get_chapters_by_novels(
-        _novels.get('novels')
+        _novels.get('novels'),
+        limit_publish=req.param(
+            'limit_publish', WEBSITE_LIMIT_PUBLISH_LATEST, int),
     )
     """Check if it hasn't novels, response to client"""
     if not _novels_chapters:
@@ -30,7 +38,9 @@ def publish_latest(req: Request, res: Response, next: Next):
         )
 
     """Save novels in db"""
-    _chapters_db = novels_en.save_novels_db(_novels_chapters)
+    _chapters_db = novels_en.save_novels_db(
+        _novels_chapters, language=NOVEL_LANGUAGE_ID
+    )
 
     """Check if it hasn't novels, response to client"""
     if not _chapters_db['data']['novels']:
@@ -61,9 +71,16 @@ def publish_latest(req: Request, res: Response, next: Next):
         # Set that the request to response with binary files
         True
     )
+
+    """Generate mobi for all novels"""
+    _build_mobi_books = novels_en.build_all_epub_to_mobi(
+        _build_pdf_books,
+        # Set that the request to response with binary files
+        True
+    )
     """Upload to storage"""
     _upload_novels = novels_en.upload_to_storage(
-        _build_pdf_books
+        _build_mobi_books
     )
     """Publish or update on website"""
     _created_posts = novels_en.publish_novels(
