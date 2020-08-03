@@ -34,6 +34,6 @@ class Request(Base, SerializerMixin):
 
     """Serialize settings"""
     serialize_only = (
-        'request', 'title', 'language',
+        'request', 'title', 'language', 'email',
         'reference', 'created_at', 'is_completed'
     )

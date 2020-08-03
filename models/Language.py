@@ -20,6 +20,8 @@ class Language(Base, SerializerMixin):
     """Attributes"""
     language = Column(Integer, primary_key=True)
     title = Column(String(20))
+    name = Column(String(20))
+    slug = Column(String(30), unique=True)
     hreflang = Column(String(2), unique=True)
     is_active = Column(Boolean, default=True)
     is_deleted = Column(Boolean, default=False)
@@ -30,5 +32,5 @@ class Language(Base, SerializerMixin):
 
     """Serialize settings"""
     serialize_only = (
-        'language', 'title'
+        'language', 'title', 'name', 'slug', 'hreflang'
     )

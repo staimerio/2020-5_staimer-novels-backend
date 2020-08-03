@@ -8,6 +8,12 @@ BACKEND_MTLNOVEL = {
     u"novels_chapters": "/novels/chapters",
 }
 
+BACKEND_NOVELFULL = {
+    u"base_url": app.config.get('APP_BACKEND_NOVELFULL'),
+    u"novels_search": "/novels",
+    u"novels_chapters": "/novels/chapters",
+}
+
 BACKEND_EPUB = {
     u"base_url": app.config.get('APP_BACKEND_EPUB'),
     u"build_from_html": "/build/from-html",
@@ -40,6 +46,11 @@ BACKEND_IMAGES = {
     u"images_remote": "/images/remote",
 }
 
+BACKEND_EMAIL = {
+    u"base_url": app.config.get('APP_BACKEND_EMAIL'),
+    u"emails": "/emails",
+}
+
 APP_BACKEND = {
     u"mtlnovel": BACKEND_MTLNOVEL,
     u"epub": BACKEND_EPUB,
@@ -47,7 +58,9 @@ APP_BACKEND = {
     u"mobi": BACKEND_MOBI,
     u"sendfiles": BACKEND_SENDFILES,
     u"lnpdf": BACKEND_LNPDF,
-    u"images": BACKEND_IMAGES
+    u"images": BACKEND_IMAGES,
+    u"novelfull": BACKEND_NOVELFULL,
+    u"email": BACKEND_EMAIL,
 }
 
 """Add Backend apps"""
