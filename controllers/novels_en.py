@@ -6,6 +6,8 @@ import binascii
 
 # Services
 import services.novels.novels_en as novels_en
+import services.novels.novels as novels
+import services.novels.languages as languages
 from retic.services.responses import success_response_service, error_response_service
 
 # Constants
@@ -15,6 +17,8 @@ WEBSITE_LIMIT_PUBLISH_LATEST = app.config.get(
     'WEBSITE_LIMIT_PUBLISH_LATEST', callback=int)
 NOVEL_LANGUAGE_ID = app.config.get(
     'NOVEL_LANGUAGE_ID', callback=int)
+URL_NOVELS_CHAPTERS = app.apps['backend']['mtlnovel']['base_url'] + \
+    app.apps['backend']['mtlnovel']['novels_chapters']
 
 
 def publish_latest(req: Request, res: Response, next: Next):
@@ -23,68 +27,15 @@ def publish_latest(req: Request, res: Response, next: Next):
         limit=req.param('limit', WEBSITE_LIMIT_LATEST, int),
         pages=req.param('pages', WEBSITE_PAGES_LATEST, int)
     )
-    """Get chapters from all novels"""
-    _novels_chapters = novels_en.get_chapters_by_novels(
+    """Get the langauge"""
+    _lang = languages.get_language_hreflang_db("en")
+    """Publish novels"""
+    _created_posts = novels.publish_novels(
         _novels.get('novels'),
-        limit_publish=req.param(
-            'limit_publish', WEBSITE_LIMIT_PUBLISH_LATEST, int),
-    )
-    """Check if it hasn't novels, response to client"""
-    if not _novels_chapters:
-        return res.ok(
-            error_response_service(
-                msg="New novels not found."
-            )
-        )
-
-    """Save novels in db"""
-    _chapters_db = novels_en.save_novels_db(
-        _novels_chapters, language=NOVEL_LANGUAGE_ID
-    )
-
-    """Check if it hasn't novels, response to client"""
-    if not _chapters_db['data']['novels']:
-        return res.ok(
-            error_response_service(
-                msg="All novels are updated."
-            )
-        )
-
-    """Generate epub for all novels"""
-    _build_epub_books = novels_en.build_all_novels_to_epub(
-        _chapters_db['data']['novels'],
-        # Set that the request to response with binary files
-        True
-    )
-
-    """Check if it hasn't novels, response to client"""
-    if not _build_epub_books:
-        return res.ok(
-            error_response_service(
-                msg="All books are updated."
-            )
-        )
-
-    """Generate pdf for all novels"""
-    _build_pdf_books = novels_en.build_all_epub_to_pdf(
-        _build_epub_books,
-        # Set that the request to response with binary files
-        True
-    )
-
-    """Generate mobi for all novels"""
-    _build_mobi_books = novels_en.build_all_epub_to_mobi(
-        _build_pdf_books,
-        # Set that the request to response with binary files
-        True
-    )
-    """Upload to storage"""
-    _upload_novels = novels_en.upload_to_storage(
-        _build_mobi_books
-    )
-    """Publish or update on website"""
-    _created_posts = novels_en.publish_novels(
-        _upload_novels
+        req.param('limit_publish', WEBSITE_LIMIT_PUBLISH_LATEST, int),
+        NOVEL_LANGUAGE_ID,
+        _lang.get('data'),
+        URL_NOVELS_CHAPTERS
     )
     """Check if exist an error"""
     if _created_posts['valid'] is False:
