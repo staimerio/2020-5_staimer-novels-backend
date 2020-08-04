@@ -43,7 +43,7 @@ def requests(req: Request, res: Response, next: Next):
     )
     """Check if exist an error"""
     if _requests_db['valid'] is False:
-        res.bad_request(_requests_db)
+        return res.bad_request(_requests_db)
     """Transform data response"""
     _data_response = {
         "request": _requests_db['data']
@@ -62,7 +62,7 @@ def get_all_requests(req: Request, res: Response, next: Next):
     _requests_db = novels_requests.get_all_db()
     """Check if exist an error"""
     if _requests_db['valid'] is False:
-        res.bad_request(_requests_db)
+        return res.bad_request(_requests_db)
     """Transform data response"""
     _data_response = {
         "requests": _requests_db['data']

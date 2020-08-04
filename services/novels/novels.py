@@ -396,7 +396,7 @@ def publish_novels_wp(novels, lang):
             _oldpost['data']['meta']['storage_data'] = _storage
             _oldpost['data']['meta']['storage_folder'] = _novel['code']
             _oldpost['data']['meta']['last_ch'] = _novel['chapters'][-1]['number']
-            _oldpost['data']['meta']['last_vol'] = 1
+            _oldpost['data']['meta']['last_vol'] = "1"
             _post = lnpdf.update_post(
                 _oldpost['data']['id'],
                 {u'meta': _oldpost['data']['meta']}

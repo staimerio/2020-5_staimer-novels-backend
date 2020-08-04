@@ -39,7 +39,7 @@ def publish_latest(req: Request, res: Response, next: Next):
     )
     """Check if exist an error"""
     if _created_posts['valid'] is False:
-        res.bad_request(_created_posts)
+        return res.bad_request(_created_posts)
     """Transform data response"""
     _data_response = {
         "posts": _created_posts['data']

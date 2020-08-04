@@ -4,6 +4,7 @@ from retic import Router
 # Controllers
 import controllers.novels_en as novels_en
 import controllers.novels_requests as novels_requests
+import controllers.novels_chapters as novels_chapters
 import controllers.languages as languages
 
 router = Router()
@@ -23,3 +24,11 @@ router \
 # Routes for languages
 router \
     .get("/novels/languages", languages.get_all_languages)
+
+# Routes for novels
+router \
+    .get("/novels/:novel", novels_chapters.get_chapters_by_novel)
+
+# Routes for novels chapters
+router \
+    .get("/novels/chapters/:chapter", novels_chapters.get_chapter_by_id)
