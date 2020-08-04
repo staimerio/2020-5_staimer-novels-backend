@@ -13,7 +13,7 @@ def get_all_languages(req: Request, res: Response, next: Next):
     _languages_db = languages.get_all_db()
     """Check if exist an error"""
     if _languages_db['valid'] is False:
-        res.bad_request(_languages_db)
+        return res.bad_request(_languages_db)
     """Transform data response"""
     _data_response = {
         "languages": _languages_db['data']
