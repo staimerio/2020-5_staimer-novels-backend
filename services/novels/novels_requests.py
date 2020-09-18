@@ -73,7 +73,8 @@ def get_all_db():
     _session = app.apps.get("db_sqlalchemy")()
     """Find in database"""
     _requests = _session.query(Request).\
-        filter(Request.is_completed == False).\
+        filter(Request.is_completed == False,
+               Request.is_active == True).\
         all()
     """Requests to json"""
     _requests_json = files_to_dict(_requests)
