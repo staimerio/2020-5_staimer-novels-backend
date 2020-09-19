@@ -25,6 +25,15 @@ def save_request_db(title, email, language, reference=None):
     """Define all variables"""
     """Create session"""
     _session = app.apps.get("db_sqlalchemy")()
+    """Find in database"""
+    _request = _session.query(Request).\
+        filter(Request.title == title,
+               Request.language == language,
+               Request.is_active == 1).\
+        first()
+    """Check if it exists in db"""
+    if _request:
+        return error_response_service(msg="Request exists.")
     _request_db = Request(
         title=title,
         email=email,
@@ -208,12 +217,15 @@ def publish_requests(requests, limit_publish, url_novels_chapters):
             _novel.get('lang'),
             url_novels_chapters
         )
-        """Add request to list"""
-        _novels_posts += _created_posts['data']
         """Completed requests"""
         _completed_requests = completed_novels_with_results(
             [_request]
         )
+        """Check if it's valid"""
+        if not _created_posts['valid']:
+            continue
+        """Add request to list"""
+        _novels_posts += _created_posts['data']
         """Create relation between novel, request and post"""
         _req_novel_post = save_request_novel_post_db(
             _novels_posts,
@@ -239,6 +251,8 @@ def publish_requests(requests, limit_publish, url_novels_chapters):
                 subject=REQUEST_SUBJECT+_novel["info"]['title'],
                 body=_email_body
             )
+        """Publish only novel"""
+        break
     """Return to request"""
     return success_response_service(
         data=_novels_posts
