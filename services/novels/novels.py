@@ -603,3 +603,32 @@ def get_by_slug_db(slug):
     return success_response_service(
         data=_data_response, msg="Novel found."
     )
+
+
+def get_by_id_db(novel):
+    """Find a file in the database by his id
+
+    :param novel: id of the novel in the database
+    """
+
+    """Find in database"""
+    _session = app.apps.get("db_sqlalchemy")()
+    _novel = _session.query(Novel, NovelPost).\
+        join(NovelPost, Novel.novel == NovelPost.novel, isouter=True).\
+        filter(Novel.novel == novel).\
+        first()
+    _session.close()
+
+    """Check if the file exists"""
+    if not _novel:
+        return error_response_service(msg="Novel not found.")
+    """Transform data"""
+    _post = _novel.NovelPost.to_dict() if _novel.NovelPost else {}
+    _data_response = {
+        **_novel.Novel.to_dict(),
+        u"post": None,
+        **_post
+    }
+    return success_response_service(
+        data=_data_response, msg="Novel found."
+    )

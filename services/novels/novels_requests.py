@@ -12,7 +12,7 @@ import services.novels.novels as novels
 import services.email.email as email
 
 # Models
-from models import Request, Language, RequestNovelPost
+from models import Request, Language, RequestNovelPost, Novel
 
 # Constants
 REQUEST_FROMADDR = app.config.get('REQUEST_FROMADDR')
@@ -148,48 +148,63 @@ def get_request_db(limit):
     )
 
 
-def get_novels_from_website(novels, limit_search):
+def get_novels_from_website(items, limit_search):
     """Declare all variables"""
     _novels_not_found = []
     _novels_found = []
     """For each novel do the following"""
-    for _novel in novels:
+    for _novel in items:
         _request = _novel['request']
         _lang = _novel['lang']
-        """Prepare the payload"""
-        _payload = {
-            u"search": _request['title'],
-            u"limit": limit_search,
-            u"hreflang": _lang['hreflang'],
-        }
 
-        """Find novels on all avalaible website"""
-
-        """NOVELFULL"""
-        """Get all novels from website"""
-        _novels_req = requests.get(URL_NOVELFULL_SEARCH, params=_payload)
-        """Check if the response is valid"""
-        if _novels_req.status_code != 200:
-            """MTLNOVEL"""
-            """Get all novels from website"""
-            _novels_req = requests.get(URL_MTLNOVEL_SEARCH, params=_payload)
-
-        """Check if the response is valid"""
-        if _novels_req.status_code == 404:
-            """Return error if the response is invalid"""
-            _novels_not_found.append(_request)
-        elif _novels_req.status_code == 200:
-            """Get json response"""
-            _novels_json = _novels_req.json()
+        """Check if it has a novel reference"""
+        if _request['novel']:
+            _novel_request = novels.get_by_id_db(_request['novel'])
+            """Check if it has any error"""
+            if not _novel_request['valid']:
+                """Return error if the response is invalid"""
+                raise Exception(_novel_request['msg'])
             """Add novels"""
             _novels_found.append({
                 u"info": _request,
-                u"lang": _novel['lang'],
-                u"requests": _novels_json['data']['novels']
+                u"lang": _lang,
+                u"requests": [_novel_request['data']]
             })
         else:
-            """Return error if the response is invalid"""
-            raise Exception(_novels_req.text)
+            """Search in the websites"""
+            """Prepare the payload"""
+            _payload = {
+                u"search": _request['title'],
+                u"limit": limit_search,
+                u"hreflang": _lang['hreflang'],
+            }
+            """Find novels on all avalaible website"""
+            """NOVELFULL"""
+            """Get all novels from website"""
+            _novels_req = requests.get(URL_NOVELFULL_SEARCH, params=_payload)
+            """Check if the response is valid"""
+            if _novels_req.status_code != 200:
+                """MTLNOVEL"""
+                """Get all novels from website"""
+                _novels_req = requests.get(
+                    URL_MTLNOVEL_SEARCH, params=_payload)
+
+            """Check if the response is valid"""
+            if _novels_req.status_code == 404:
+                """Return error if the response is invalid"""
+                _novels_not_found.append(_request)
+            elif _novels_req.status_code == 200:
+                """Get json response"""
+                _novels_json = _novels_req.json()
+                """Add novels"""
+                _novels_found.append({
+                    u"info": _request,
+                    u"lang": _lang,
+                    u"requests": _novels_json['data']['novels']
+                })
+            else:
+                """Return error if the response is invalid"""
+                raise Exception(_novels_req.text)
     """Return novels"""
     return _novels_found, _novels_not_found
 

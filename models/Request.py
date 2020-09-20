@@ -29,11 +29,13 @@ class Request(Base, SerializerMixin):
     is_deleted = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now())
     deleted_at = Column(DateTime, nullable=True)
+    novel = Column(Integer, ForeignKey('novels.novel'))
 
     """Relationships"""
 
     """Serialize settings"""
     serialize_only = (
         'request', 'title', 'language', 'email',
-        'reference', 'created_at', 'is_completed'
+        'reference', 'created_at', 'is_completed',
+        'novel'
     )
