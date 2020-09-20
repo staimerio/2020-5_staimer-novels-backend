@@ -57,6 +57,26 @@ def save_request_db(title, email, language, reference=None):
     )
 
 
+def save_requests_from_file_db(file, email, language, reference=None):
+    """Define all variables"""
+    _requests = []
+    """Read content from file"""
+    _content = file.read().decode("utf-8")
+    """Split in lines"""
+    _lines = _content.split("\r\n")
+    """For each line do the following"""
+    for _title in _lines:
+        _request = save_request_db(_title, email, language, reference)
+        """Check if has any error"""
+        if _request['valid']:
+            _requests.append(_request['data'])
+    """Response"""
+    return success_response_service(
+        data=_requests,
+        msg="Requests created."
+    )
+
+
 def save_request_novel_post_db(posts, request):
     """Define all variables"""
     """Create session"""
