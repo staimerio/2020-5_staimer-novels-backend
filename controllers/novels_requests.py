@@ -13,8 +13,6 @@ WEBSITE_LIMIT_PUBLISH_CHAPTERS_REQUESTS = app.config.get(
     'WEBSITE_LIMIT_PUBLISH_CHAPTERS_REQUESTS', callback=int)
 WEBSITE_LIMIT_SEARCH_LIMIT = app.config.get(
     'WEBSITE_LIMIT_SEARCH_LIMIT', callback=int)
-URL_NOVELS_CHAPTERS = app.apps['backend']['novelfull']['base_url'] + \
-    app.apps['backend']['novelfull']['novels_chapters']
 
 
 def requests(req: Request, res: Response, next: Next):
@@ -96,8 +94,7 @@ def publish_requests(req: Request, res: Response):
     """Get chapters from all novels"""
     _novels_chapters = novels_requests.publish_requests(
         _novels_found,
-        limit_publish=req.param('limit_publish', WEBSITE_LIMIT_PUBLISH_CHAPTERS_REQUESTS, int),
-        url_novels_chapters=URL_NOVELS_CHAPTERS
+        limit_publish=req.param('limit_publish', WEBSITE_LIMIT_PUBLISH_CHAPTERS_REQUESTS, int)
     )
     """Check if exist an error"""
     if _novels_chapters['valid'] is False:

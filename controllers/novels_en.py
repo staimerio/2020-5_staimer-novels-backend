@@ -34,8 +34,7 @@ def publish_latest(req: Request, res: Response, next: Next):
         _novels.get('novels'),
         req.param('limit_publish', WEBSITE_LIMIT_PUBLISH_LATEST, int),
         NOVEL_LANGUAGE_ID,
-        _lang.get('data'),
-        URL_NOVELS_CHAPTERS
+        _lang.get('data')
     )
     """Check if exist an error"""
     if _created_posts['valid'] is False:

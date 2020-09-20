@@ -17,8 +17,11 @@ from models import Request, Language, RequestNovelPost
 # Constants
 REQUEST_FROMADDR = app.config.get('REQUEST_FROMADDR')
 REQUEST_SUBJECT = app.config.get('REQUEST_SUBJECT')
-URL_NOVELS_SEARCH = app.apps['backend']['novelfull']['base_url'] + \
+
+URL_NOVELFULL_SEARCH = app.apps['backend']['novelfull']['base_url'] + \
     app.apps['backend']['novelfull']['novels_search']
+URL_MTLNOVEL_SEARCH = app.apps['backend']['mtlnovel']['base_url'] + \
+    app.apps['backend']['mtlnovel']['novels_search']
 
 
 def save_request_db(title, email, language, reference=None):
@@ -132,13 +135,25 @@ def get_novels_from_website(novels, limit_search):
     """For each novel do the following"""
     for _novel in novels:
         _request = _novel['request']
+        _lang = _novel['lang']
         """Prepare the payload"""
         _payload = {
             u"search": _request['title'],
-            u"limit": limit_search
+            u"limit": limit_search,
+            u"hreflang": _lang['hreflang'],
         }
+
+        """Find novels on all avalaible website"""
+
+        """NOVELFULL"""
         """Get all novels from website"""
-        _novels_req = requests.get(URL_NOVELS_SEARCH, params=_payload)
+        _novels_req = requests.get(URL_NOVELFULL_SEARCH, params=_payload)
+        """Check if the response is valid"""
+        if _novels_req.status_code != 200:
+            """MTLNOVEL"""
+            """Get all novels from website"""
+            _novels_req = requests.get(URL_MTLNOVEL_SEARCH, params=_payload)
+
         """Check if the response is valid"""
         if _novels_req.status_code == 404:
             """Return error if the response is invalid"""
@@ -198,9 +213,8 @@ def completed_novels_with_results(novels):
     )
 
 
-def publish_requests(requests, limit_publish, url_novels_chapters):
+def publish_requests(requests, limit_publish):
     """Publish all result for the search"""
-
     """Declare all variables"""
     _novels_posts = []
     """Check it has novels"""
@@ -214,8 +228,7 @@ def publish_requests(requests, limit_publish, url_novels_chapters):
             _novel.get('requests'),
             limit_publish,
             _request['language'],
-            _novel.get('lang'),
-            url_novels_chapters
+            _novel.get('lang')
         )
         """Completed requests"""
         _completed_requests = completed_novels_with_results(

@@ -17,6 +17,7 @@ import services.lnpdf.lnpdf as lnpdf
 import services.images.images as images
 from services.general.general import get_mb_from_bytes_round
 from services.general.database import files_to_dict
+import services.novels.sites as sites
 
 # Models
 from models import Novel, Chapter, NovelPost
@@ -36,13 +37,11 @@ def publish_novels(
     limit_publish,
     language,
     lang,
-    url_novels_chapters
 ):
     """Get chapters from all novels"""
     _novels_chapters = get_chapters_by_novels(
         novels,
         limit_publish=limit_publish,
-        url_novels_chapters=url_novels_chapters
     )
     """Check if it hasn't novels, response to client"""
     if not _novels_chapters:
@@ -530,7 +529,6 @@ def save_post_novel_db(post, novel):
 def get_chapters_by_novels(
     novels,
     limit_publish,
-    url_novels_chapters,
     limit=NOVEL_CHAPTERS_LIMIT,
 ):
     """Define all variables"""
@@ -551,9 +549,11 @@ def get_chapters_by_novels(
                 _chapter.title for _chapter in _novel_chapters
             ]
             _novel_chapters_db = files_to_dict(_novel_chapters)
+        """Define the url"""
+        _url_novels_chapters = sites.get_ur_chapters_from_site(_novel['site'])
         """Get all chapters of the novels without ids that exists"""
         _novel_chapters = chapters.get_chapters_from_website(
-            url_novels_chapters,
+            _url_novels_chapters,
             _novel['url'],
             _novel_chapters_ids,
             limit

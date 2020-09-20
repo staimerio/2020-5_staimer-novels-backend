@@ -6,6 +6,7 @@ BACKEND_MTLNOVEL = {
     u"base_url": app.config.get('APP_BACKEND_MTLNOVEL'),
     u"novels_latest": "/novels/latest",
     u"novels_chapters": "/novels/chapters",
+    u"novels_search": "/novels",
 }
 
 BACKEND_NOVELFULL = {
