@@ -229,7 +229,7 @@ def completed_novels_with_results(novels):
     _session.close()
     """Response"""
     return success_response_service(
-        msg="Requests deactivated."
+        msg="Requests completed."
     )
 
 
@@ -243,6 +243,8 @@ def publish_requests(requests, limit_publish):
     """For each request do the following"""
     for _novel in requests:
         _request = _novel['info']
+        """Deactived novels"""
+        deactivated_novels_without_results([_request])
         """Publish novels"""
         _created_posts = novels.publish_novels(
             _novel.get('requests'),
@@ -250,13 +252,13 @@ def publish_requests(requests, limit_publish):
             _request['language'],
             _novel.get('lang')
         )
+        """Check if it's valid"""
+        if not _created_posts['valid']:
+            continue
         """Completed requests"""
         _completed_requests = completed_novels_with_results(
             [_request]
         )
-        """Check if it's valid"""
-        if not _created_posts['valid']:
-            continue
         """Add request to list"""
         _novels_posts += _created_posts['data']
         """Create relation between novel, request and post"""
