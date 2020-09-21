@@ -95,3 +95,27 @@ def get_post(
     _post_json = _post.json()
     """Return data"""
     return _post_json
+
+
+def search_post_by_slug(
+    slug
+):
+    """Get a post on website"""
+
+    """Prepare payload for the request"""
+    _payload = {
+        u"slug": slug
+    }
+    """Build epub file"""
+    _post = requests.get(
+        URL_LNPDF_POSTS,
+        params=_payload
+    )
+    """Check if the response is valid"""
+    if _post.status_code != 200:
+        """Return error if the response is invalid"""
+        return None
+    """Get json response"""
+    _post_json = _post.json()
+    """Return data"""
+    return _post_json

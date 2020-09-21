@@ -356,6 +356,7 @@ def publish_novels_wp(novels, lang):
     _published_novels = []
     """For each novels do to the following"""
     for _novel in novels:
+        _post = None
         """Add epub version"""
         _storage = "{0},{1},{2},{3},{4}\n".format(
             _novel['lang'],
@@ -387,8 +388,24 @@ def publish_novels_wp(novels, lang):
             """Get post by id"""
             _oldpost = lnpdf.get_post(_novel['post'])
         else:
-            _oldpost = None
+            """Search post by slug"""
+            _oldpost = lnpdf.search_post_by_slug(_novel['slug'])
+        """Check if the novel exists"""
         if _oldpost and 'data' in _oldpost and 'meta' in _oldpost['data']:
+            """Transform to new format"""
+            if not _oldpost['data']['meta']['id_eu_novel']:
+                """Upload cover"""
+                _cover = images.upload_images_from_urls(
+                    urls=[_novel['cover']],
+                    watermark_code="lnpdf.png"
+                )
+                _oldpost['data']['meta']['cover'] = _cover['data']['images'][-1]['link']
+                _oldpost['data']['meta']['id_eu_novel'] = _novel['novel']
+                _oldpost['data']['meta']['author'] = _novel['author']
+                _oldpost['data']['meta']['year'] = _novel['year']
+                _oldpost['data']['meta']['url'] = _novel['url']
+
+            _oldpost['data']['meta']['storage_data'] = _storage
             """Get old storage folder"""
             _old_storage_folder = _oldpost['data']['meta']['storage_folder']
             """Set metadata about the post"""
@@ -402,12 +419,17 @@ def publish_novels_wp(novels, lang):
             )
             """Check if is a valid post"""
             if _post and _post['valid']:
-                """Delete old folder"""
-                _deleted_folder = sendfiles.delete_folder(
-                    _old_storage_folder
-                )
-                """Add post to the list"""
-                _published_novels.append(_post['data'])
+                if _old_storage_folder:
+                    """Delete old folder"""
+                    _deleted_folder = sendfiles.delete_folder(
+                        _old_storage_folder
+                    )
+                else:
+                    """Add post to novel"""
+                    _novel_post = save_post_novel_db(
+                        _post['data']['id'],
+                        _novel['novel']
+                    )
         else:
             """If the posts doesn't exists, create the post"""
             """Upload cover"""
@@ -458,8 +480,10 @@ def publish_novels_wp(novels, lang):
                     _post['data']['id'],
                     _novel['novel']
                 )
-                """Add post to the list"""
-                _published_novels.append(_post['data'])
+        """Check if is a valid post"""
+        if _post and _post['valid']:
+            """Add post to the list"""
+            _published_novels.append(_post['data'])
     """Return the posts list"""
     return success_response_service(
         data=_published_novels
