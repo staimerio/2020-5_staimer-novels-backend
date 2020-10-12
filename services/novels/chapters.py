@@ -11,12 +11,13 @@ from models import Chapter
 from retic.services.responses import success_response_service, error_response_service
 
 
-def get_chapters_from_website(url, slug_novel, chaptersIds, limit):
+def get_chapters_from_website(url, slug_novel, chaptersIds, limit, lang):
     """Prepare the payload"""
     _payload = {
         u"chapters_ids": chaptersIds,
         u"slug_novel": slug_novel,
-        u"limit": limit
+        u"limit": limit,
+        u"lang": lang,
     }
     """Get all chapters from website"""
     _chapters = requests.get(url, params=_payload)

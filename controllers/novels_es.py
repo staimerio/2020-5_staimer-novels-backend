@@ -2,10 +2,10 @@
 from retic import Request, Response, Next, App as app
 
 # Binascii
-import binascii
+# import binascii
 
 # Services
-import services.novels.novels_en as novels_en
+import services.novels.novels_es as novels_es
 import services.novels.novels as novels
 import services.novels.languages as languages
 from retic.services.responses import success_response_service, error_response_service
@@ -21,12 +21,12 @@ URL_NOVELS_CHAPTERS = app.apps['backend']['mtlnovel']['base_url'] + \
 
 def publish_latest(req: Request, res: Response, next: Next):
     """Get novels from website"""
-    _novels = novels_en.get_novels_from_website(
+    _novels = novels_es.get_novels_from_website(
         limit=req.param('limit', WEBSITE_LIMIT_LATEST, int),
         pages=req.param('pages', WEBSITE_PAGES_LATEST, int)
     )
     """Get the langauge"""
-    _lang = languages.get_language_hreflang_db("en")
+    _lang = languages.get_language_hreflang_db("es")
     """Publish novels"""
     _created_posts = novels.publish_novels(
         _novels.get('novels'),

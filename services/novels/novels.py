@@ -42,6 +42,8 @@ def publish_novels(
     _novels_chapters = get_chapters_by_novels(
         novels,
         limit_publish=limit_publish,
+        language=language,
+        lang=lang,
     )
     """Check if it hasn't novels, response to client"""
     if not _novels_chapters:
@@ -146,52 +148,55 @@ def save_novels_db(novels, language):
     _novels = []
     """For each novel do the following"""
     for _novel in novels:
-        """Check that there are chapters"""
-        if not _novel['chapters']:
-            continue
+        try:
+            """Check that there are chapters"""
+            if not _novel['chapters']:
+                continue
 
-        """Create session"""
-        _session = app.apps.get("db_sqlalchemy")()
-        """Check if the novel no exists in the db"""
-        if not _novel['db']:
-            """If not exists, save"""
-            _novel_db = Novel(
-                url=_novel['url'],
-                year=_novel['year'],
-                title=_novel['title'],
-                slug=_novel['slug'],
-                site=_novel['site'],
-                language=language,
-            )
-            _session.add(_novel_db)
-            _session.flush()
-            _novel_id = _novel_db.novel
+            """Create session"""
+            _session = app.apps.get("db_sqlalchemy")()
+            """Check if the novel no exists in the db"""
+            if not _novel['db']:
+                """If not exists, save"""
+                _novel_db = Novel(
+                    url=_novel['url'],
+                    year=_novel['year'],
+                    title=_novel['title'],
+                    slug=_novel['slug'],
+                    site=_novel['site'],
+                    language=language,
+                )
+                _session.add(_novel_db)
+                _session.flush()
+                _novel_id = _novel_db.novel
+                """Add novel to list"""
+                _novel['db'] = _novel_db.to_dict()
+            else:
+                """Set novel"""
+                _novel_id = _novel['db']['novel']
+            """Prepare all chapters"""
+            _chapters_db = [
+                Chapter(
+                    number=chapter['number'],
+                    content=chapter['content'],
+                    title=chapter['title'],
+                    novel=_novel_id
+                ) for chapter in _novel['chapters']
+            ]
+            """Save chapters in database"""
+            _session.add_all(_chapters_db)
+            """Save in database"""
+            _session.commit()
+            """Close session"""
+            _session.close()
             """Add novel to list"""
-            _novel['db'] = _novel_db.to_dict()
-        else:
-            """Set novel"""
-            _novel_id = _novel['db']['novel']
-        """Prepare all chapters"""
-        _chapters_db = [
-            Chapter(
-                number=chapter['number'],
-                content=chapter['content'],
-                title=chapter['title'],
-                novel=_novel_id
-            ) for chapter in _novel['chapters']
-        ]
-        """Save chapters in database"""
-        _session.add_all(_chapters_db)
-        """Save in database"""
-        _session.commit()
-        """Close session"""
-        _session.close()
-        """Add novel to list"""
-        _novels.append({
-            **_novel,
-            **_novel['info'],
-            **_novel['db']
-        })
+            _novels.append({
+                **_novel,
+                **_novel['info'],
+                **_novel['db']
+            })
+        except Exception as e:
+            continue
     """Transform respose"""
     _data_response = {
         u"novels": _novels
@@ -388,7 +393,6 @@ def publish_novels_wp(novels, lang):
             """Get post by id"""
             _oldpost = lnpdf.get_post(_novel['post'])
         else:
-            """Search post by slug"""
             _oldpost = lnpdf.search_post_by_slug(_novel['slug'])
         """Check if the novel exists"""
         if _oldpost and 'data' in _oldpost and 'meta' in _oldpost['data']:
@@ -554,6 +558,8 @@ def get_chapters_by_novels(
     novels,
     limit_publish,
     limit=NOVEL_CHAPTERS_LIMIT,
+    language=None,
+    lang=None,
 ):
     """Define all variables"""
     _novel_chapters_ids = []
@@ -561,7 +567,7 @@ def get_chapters_by_novels(
     """For each novel do the following"""
     for _novel in novels:
         """Find novel in db"""
-        _novel_db = get_by_slug_db(_novel['slug'])
+        _novel_db = get_by_slug_db(_novel['slug'], language)
         _novel_chapters_db = []
         # """Check if novel exists"""
         if _novel_db['valid'] is True:
@@ -577,10 +583,11 @@ def get_chapters_by_novels(
         _url_novels_chapters = sites.get_ur_chapters_from_site(_novel['site'])
         """Get all chapters of the novels without ids that exists"""
         _novel_chapters = chapters.get_chapters_from_website(
-            _url_novels_chapters,
-            _novel['url'],
-            _novel_chapters_ids,
-            limit
+            url=_url_novels_chapters,
+            slug_novel=_novel['url'],
+            chaptersIds=_novel_chapters_ids,
+            limit=limit,
+            lang=lang['hreflang'],
         )
         """Check if it has any problem"""
         if not _novel_chapters:
@@ -600,17 +607,18 @@ def get_chapters_by_novels(
     return _novels_chapters
 
 
-def get_by_slug_db(slug):
+def get_by_slug_db(slug, language):
     """Find a file in the database by his slug
 
     :param slug: Slug of the novel in the database
+    :param language: Ide of the language in the database
     """
 
     """Find in database"""
     _session = app.apps.get("db_sqlalchemy")()
     _novel = _session.query(Novel, NovelPost).\
         join(NovelPost, Novel.novel == NovelPost.novel, isouter=True).\
-        filter(Novel.slug == slug).\
+        filter(Novel.slug == slug, Novel.language == language).\
         first()
     _session.close()
 

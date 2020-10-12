@@ -12,6 +12,8 @@ def get_ur_chapters_from_site(site):
     """Get an MTLNovel instance from a language"""
     if site == "mtlnovelcom":
         return URL_MTLNOVEL_CHAPTERS
+    elif site == "esmtlnovelcom":
+        return URL_MTLNOVEL_CHAPTERS
     elif site == "novelfullcom":
         return URL_NOVELFULL_CHAPTERS
     raise ValueError("Site {0} is invalid.".format(site))
