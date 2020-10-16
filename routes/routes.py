@@ -4,6 +4,7 @@ from retic import Router
 # Controllers
 import controllers.novels_en as novels_en
 import controllers.novels_es as novels_es
+import controllers.novels_id as novels_id
 import controllers.novels_requests as novels_requests
 import controllers.novels_chapters as novels_chapters
 import controllers.languages as languages
@@ -15,6 +16,9 @@ router.post("/novels/latest/en", novels_en.publish_latest)
 
 # Novels ES
 router.post("/novels/latest/es", novels_es.publish_latest)
+
+# Novels ID
+router.post("/novels/latest/id", novels_id.publish_latest)
 
 # Routes for requests
 router \
