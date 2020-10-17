@@ -18,4 +18,6 @@ def get_ur_chapters_from_site(site):
         return URL_NOVELFULL_CHAPTERS
     elif site == "idmtlnovelcom":
         return URL_MTLNOVEL_CHAPTERS
+    elif site == "frmtlnovelcom":
+        return URL_MTLNOVEL_CHAPTERS
     raise ValueError("Site {0} is invalid.".format(site))
