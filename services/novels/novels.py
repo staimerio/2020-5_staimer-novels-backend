@@ -408,6 +408,7 @@ def publish_novels_wp(novels, lang):
                 _oldpost['data']['meta']['author'] = _novel['author']
                 _oldpost['data']['meta']['year'] = _novel['year']
                 _oldpost['data']['meta']['url'] = _novel['url']
+                _oldpost['data']['meta']['alt_name'] = _novel['alt_name']
 
             _oldpost['data']['meta']['storage_data'] = _storage
             """Get old storage folder"""
@@ -453,9 +454,10 @@ def publish_novels_wp(novels, lang):
                 "storage_folder":  _novel['code'],
                 "url":  _novel['url'],
                 "id_eu_novel": _novel['novel'],
+                "alt_name": _novel['alt_name'],
             }
             _post = lnpdf.create_post(
-                title=_novel['title'],
+                title=_novel['title'] if lang['hreflang'] != 'zh' else _novel['alt_name'],
                 slug=_novel['slug'],
                 categories=[
                     {
@@ -467,7 +469,7 @@ def publish_novels_wp(novels, lang):
                     {u"name": _novel['author']},
                     {u"name": _novel['status']},
                     {u"name": _novel['year']},
-                    {u"name": _novel['lang']},
+                    {u"name": lang['name']},
                 ],
                 types=[
                     {u"name": _novel['type']},
