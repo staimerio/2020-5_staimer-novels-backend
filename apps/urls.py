@@ -23,7 +23,8 @@ BACKEND_EPUB = {
 
 BACKEND_PDF = {
     u"base_url": app.config.get('APP_BACKEND_PDF'),
-    u"build_from_epub": "/build/from-epub",
+    # u"build_from_epub": "/build/from-epub",
+    u"build_from_epub": "/build/from-epub2pdf",
 }
 
 BACKEND_MOBI = {
