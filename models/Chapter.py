@@ -33,5 +33,5 @@ class Chapter(Base, SerializerMixin):
 
     """Serialize settings"""
     serialize_only = (
-        'chapter', 'number', 'content', 'created_at', 'title'
+        'chapter', 'number', 'content', 'created_at', 'title', 'novel'
     )

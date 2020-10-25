@@ -9,7 +9,7 @@ from models import Chapter
 
 # Services
 from retic.services.responses import success_response_service, error_response_service
-
+from sqlalchemy import desc
 
 def get_chapters_from_website(url, slug_novel, chaptersIds, limit, lang):
     """Prepare the payload"""
@@ -95,13 +95,44 @@ def get_chapter_by_id_db(chapter):
             Chapter.is_active == True
     ).\
         first()
-    _session.close()
 
     """Check if the file exists"""
     if not _chapter:
+        _session.close()
         return error_response_service(msg="Chapter not found.")
     """Transform data"""
     _chapter_json = _chapter.to_dict()
+    """Pagination"""
+    _chapter_next = _session.query(Chapter).\
+        filter(
+            Chapter.chapter > chapter,
+            Chapter.novel == _chapter_json['novel'],
+            Chapter.is_deleted == False,
+            Chapter.is_active == True
+    ).\
+        first()
+    if _chapter_next:
+        _chapter_json['next'] = _chapter_next.to_dict()
+        del _chapter_json['next']['content']
+    else:
+        _chapter_json['next'] = None
+    _chapter_prev = _session.query(Chapter).\
+        filter(
+            Chapter.chapter < chapter,
+            Chapter.novel == _chapter_json['novel'],
+            Chapter.is_deleted == False,
+            Chapter.is_active == True
+    ).\
+        order_by(desc(Chapter.chapter)).\
+        first()
+    if _chapter_prev:
+        _chapter_json['prev'] = _chapter_prev.to_dict()
+        del _chapter_json['prev']['content']
+    else:
+        _chapter_json['prev'] = None
+    """Close session"""
+    _session.close()
+
     """Response data"""
     return success_response_service(
         data=_chapter_json, msg="Chapter found."
