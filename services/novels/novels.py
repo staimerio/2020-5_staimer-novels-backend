@@ -224,10 +224,13 @@ def build_all_epub_to_pdf(books, binary_response):
         _pdf_books_files.append(
             ('files', (_book['title'], _book['epub_binary']))
         )
-    _build_files = pdf.build_pdfs_from_epub(
-        _pdf_books_files,
-        binary_response
-    )
+    try:
+        _build_files = pdf.build_pdfs_from_epub(
+            _pdf_books_files,
+            binary_response
+        )    
+    except Exception as e:
+        return books
     """Check if the response has any problem"""
     if _build_files['valid'] is False:
         return books
@@ -267,11 +270,14 @@ def build_all_epub_to_mobi(books, binary_response):
         """Get bytes file"""
         _mobi_books_files.append(
             ('files', (_book['title'], _book['epub_binary']))
-        )
-    _build_files = mobi.build_mobi_from_epub(
-        _mobi_books_files,
-        binary_response
-    )
+        )    
+    try:
+        _build_files = mobi.build_mobi_from_epub(
+            _mobi_books_files,
+            binary_response
+        )    
+    except Exception as e:
+        return books
     """Check if the response has any problem"""
     if _build_files['valid'] is False:
         return books
