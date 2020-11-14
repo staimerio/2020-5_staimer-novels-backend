@@ -575,13 +575,20 @@ def get_chapters_by_novels(
     """For each novel do the following"""
     for _novel in novels:
         """Find novel in db"""
-        _novel_db = get_by_slug_db(_novel['slug'], language)
         _novel_chapters_db = []
+        if 'novel' in _novel and _novel['novel']:
+            _novel_db = {**_novel}
+        else:
+            _req_novel_db = get_by_slug_db(_novel['slug'], language)
+            if _novel_db['valid'] is True:
+                _novel_db = _req_novel_db['data']
+            else:
+                _novel_db = None
         # """Check if novel exists"""
-        if _novel_db['valid'] is True:
+        if _novel_db:
             """Get all chapters ids"""
             _novel_chapters = chapters.get_chapters_from_db_by_novel(
-                _novel_db['data']['novel']
+                _novel_db['novel']
             )
             _novel_chapters_ids = [
                 _chapter.title for _chapter in _novel_chapters
@@ -606,7 +613,7 @@ def get_chapters_by_novels(
         """Add info to novel"""
         _novel['info'] = _novel_chapters.get('novel')
         """The novel exists?"""
-        _novel['db'] = _novel_db['data'] if _novel_db['valid'] is True else None
+        _novel['db'] = _novel_db
         """Add novel to list"""
         _novels_chapters.append(_novel)
         """Check if is the max"""
