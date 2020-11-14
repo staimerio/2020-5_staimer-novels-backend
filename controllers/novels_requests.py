@@ -70,7 +70,8 @@ def requests(req: Request, res: Response):
     _requests_db = novels_requests.save_request_db(
         title=req.param('title'),
         email=req.param('email'),
-        language=req.param('language')
+        language=req.param('language'),
+        novel=req.param('novel'),
     )
     """Check if exist an error"""
     if _requests_db['valid'] is False:

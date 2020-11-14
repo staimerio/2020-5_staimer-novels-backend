@@ -24,7 +24,7 @@ URL_MTLNOVEL_SEARCH = app.apps['backend']['mtlnovel']['base_url'] + \
     app.apps['backend']['mtlnovel']['novels_search']
 
 
-def save_request_db(title, email, language, reference=None):
+def save_request_db(title, email, language, reference=None, novel=None):
     """Define all variables"""
     """Create session"""
     _session = app.apps.get("db_sqlalchemy")()
@@ -41,7 +41,8 @@ def save_request_db(title, email, language, reference=None):
         title=title,
         email=email,
         language=language,
-        reference=reference
+        reference=reference,
+        novel=novel,
     )
     _session.add(_request_db)
     """Save in database"""
