@@ -20,7 +20,7 @@ def get_chapters_from_website(url, slug_novel, chaptersIds, limit, lang):
         u"lang": lang,
     }
     """Get all chapters from website"""
-    _chapters = requests.post(url, params=_payload)
+    _chapters = requests.post(url, json=_payload)
     """Check if the response is valid"""
     if _chapters.status_code != 200:
         """Return error if the response is invalid"""
