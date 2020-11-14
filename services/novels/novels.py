@@ -228,7 +228,7 @@ def build_all_epub_to_pdf(books, binary_response):
         _build_files = pdf.build_pdfs_from_epub(
             _pdf_books_files,
             binary_response
-        )    
+        )
     except Exception as e:
         return books
     """Check if the response has any problem"""
@@ -270,12 +270,12 @@ def build_all_epub_to_mobi(books, binary_response):
         """Get bytes file"""
         _mobi_books_files.append(
             ('files', (_book['title'], _book['epub_binary']))
-        )    
+        )
     try:
         _build_files = mobi.build_mobi_from_epub(
             _mobi_books_files,
             binary_response
-        )    
+        )
     except Exception as e:
         return books
     """Check if the response has any problem"""
@@ -460,7 +460,7 @@ def publish_novels_wp(novels, lang):
                 "storage_folder":  _novel['code'],
                 "url":  _novel['url'],
                 "id_eu_novel": _novel['novel'],
-                "alt_name": _novel['alt_name'],
+                "alt_name": _novel['alt_name'] if 'alt_name' in _novel else '',
             }
             _post = lnpdf.create_post(
                 title=_novel['title'] if lang['hreflang'] != 'zh' else _novel['alt_name'],
