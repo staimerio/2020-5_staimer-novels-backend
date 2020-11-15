@@ -71,6 +71,7 @@ def requests(req: Request, res: Response):
         title=req.param('title'),
         email=req.param('email'),
         language=req.param('language'),
+        reference=req.param('reference'),
         novel=req.param('novel'),
     )
     """Check if exist an error"""
