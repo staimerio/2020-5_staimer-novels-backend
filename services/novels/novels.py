@@ -576,14 +576,13 @@ def get_chapters_by_novels(
     for _novel in novels:
         """Find novel in db"""
         _novel_chapters_db = []
+        _novel_db = None
         if 'novel' in _novel and _novel['novel']:
             _novel_db = {**_novel}
         else:
             _req_novel_db = get_by_slug_db(_novel['slug'], language)
-            if _novel_db['valid'] is True:
+            if _req_novel_db['valid'] is True:
                 _novel_db = _req_novel_db['data']
-            else:
-                _novel_db = None
         # """Check if novel exists"""
         if _novel_db:
             """Get all chapters ids"""
