@@ -10,6 +10,7 @@ import controllers.novels_zh as novels_zh
 import controllers.novels_requests as novels_requests
 import controllers.novels_chapters as novels_chapters
 import controllers.languages as languages
+import controllers.feedback as feedback
 
 router = Router()
 
@@ -48,3 +49,7 @@ router \
 # Routes for novels chapters
 router \
     .get("/novels/chapters/:chapter", novels_chapters.get_chapter_by_id)
+
+# Routes for requests
+router \
+    .post("/feedback", feedback.save_feedback)
