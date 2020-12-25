@@ -31,6 +31,9 @@ WEBSITE_URL_COVER = app.config.get('WEBSITE_URL_COVER')
 WEBSITE_TITLE_COVER = app.config.get('WEBSITE_TITLE_COVER')
 NOVEL_CHAPTERS_LIMIT = app.config.get('NOVEL_CHAPTERS_LIMIT', callback=int)
 
+URL_PROXY_IMAGES = app.apps['backend']['apilnpdf']['base_url'] + \
+    app.apps['backend']['apilnpdf']['proxy_images']
+
 
 def publish_novels(
     novels,
@@ -96,6 +99,76 @@ def publish_novels(
     _created_posts = publish_novels_wp(
         _upload_novels,
         lang
+    )
+    return _created_posts
+
+
+def publish_novels_new(
+    novels,
+    limit_publish,
+    language,
+    lang,
+    proxy_images=False
+):
+    """Get chapters from all novels"""
+    _novels_chapters = get_chapters_by_novels(
+        novels,
+        limit_publish=limit_publish,
+        language=language,
+        lang=lang,
+    )
+    """Check if it hasn't novels, response to client"""
+    if not _novels_chapters:
+        return error_response_service(
+            msg="New novels not found."
+        )
+
+    """Save novels in db"""
+    _chapters_db = save_novels_db(
+        _novels_chapters, language=language
+    )
+
+    """Check if it hasn't novels, response to client"""
+    if not _chapters_db['data']['novels']:
+        return error_response_service(
+            msg="All novels are updated."
+        )
+
+    """Generate epub for all novels"""
+    _build_epub_books = build_all_novels_to_epub(
+        _chapters_db['data']['novels'],
+        # Set that the request to response with binary files
+        True
+    )
+
+    """Check if it hasn't novels, response to client"""
+    if not _build_epub_books:
+        return error_response_service(
+            msg="All books are updated."
+        )
+
+    """Generate pdf for all items"""
+    _build_pdf_books = build_all_items_to_pdf(
+        _build_epub_books,
+        # Set that the request to response with binary files
+        True
+    )
+
+    """Generate mobi for all novels"""
+    # _build_mobi_books = build_all_epub_to_mobi(
+    #     _build_pdf_books,
+    #     # Set that the request to response with binary files
+    #     True
+    # )
+    """Upload to storage"""
+    _upload_novels = upload_to_storage(
+        _build_pdf_books
+    )
+    """Publish or update on website"""
+    _created_posts = publish_novels_wp(
+        _upload_novels,
+        lang,
+        proxy_images=proxy_images,
     )
     return _created_posts
 
@@ -356,7 +429,7 @@ def upload_to_storage(novels):
     return _uploaded_novels
 
 
-def publish_novels_wp(novels, lang):
+def publish_novels_wp(novels, lang, proxy_images=False):
     """Publish all novels but it check if the post exists,
     in this case, it will update the post.
 
@@ -367,6 +440,11 @@ def publish_novels_wp(novels, lang):
     _published_novels = []
     """For each novels do to the following"""
     for _novel in novels:
+        """Proxy images"""
+        if proxy_images:
+            _novel['cover'] = "{0}?url={1}".format(
+                URL_PROXY_IMAGES, _novel['cover']
+            )
         _post = None
         """Add epub version"""
         _storage = "{0},{1},{2},{3},{4}\n".format(
@@ -678,3 +756,48 @@ def get_by_id_db(novel):
     return success_response_service(
         data=_data_response, msg="Novel found."
     )
+
+
+def build_all_items_to_pdf(novels, binary_response):
+    """Build all items to epub files
+
+    :param items: List of items that you want to build to epub
+    :param binary_response: Flag that assign if the response will has a binary file
+    """
+
+    """Define all variables"""
+    _pdf_novels = []
+    """For each novel do the following"""
+    for _novel in novels:
+        _chapters = _novel['chapters']
+        if not _chapters:
+            return _pdf_novels
+        """For each novel do the following"""
+        _item = {**_novel['info'], u'chapters': _chapters}
+        """Build cover in HTML"""
+        _cover = build_cover_html_from_novel(_item)
+        """Build the novel from html"""
+        _build_items = pdf.build_pdf_from_html(
+            _item['title'],
+            _cover,
+            [_item],
+            NOVEL_PREFIX_CH_EN,
+            binary_response,
+        )
+
+        """Check if the response has any problem"""
+        if _build_items['valid'] is False:
+            return _pdf_novels
+        """Get binary from the file"""
+        _fbinary = binascii.a2b_base64(
+            _build_items['data']['pdf']['pdf_b64']
+        )
+        """Add the novel to response list"""
+        _pdf_novels.append({
+            **_novel,
+            **_item,
+            **_build_items['data']['pdf'],
+            u"pdf_binary": _fbinary,
+        })
+    """Return data"""
+    return _pdf_novels

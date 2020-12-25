@@ -25,6 +25,7 @@ BACKEND_PDF = {
     u"base_url": app.config.get('APP_BACKEND_PDF'),
     u"build_from_epub": "/build/from-epub",
     # u"build_from_epub": "/build/from-epub2pdf",
+    u"build_from_html": "/build/from-html",
 }
 
 BACKEND_MOBI = {
@@ -53,6 +54,16 @@ BACKEND_EMAIL = {
     u"emails": "/emails",
 }
 
+BACKEND_RANOBELIB = {
+    u"base_url": app.config.get('APP_BACKEND_RANOBELIB'),
+    u"novels_latest": "/novels/latest",
+    u"novels_chapters": "/novels/chapters",
+}
+
+APP_LNPDF = {
+    u"base_url": app.config.get('APP_APP_LNPDF'),
+    u"proxy_images": "/proxyimages.php",
+}
 APP_BACKEND = {
     u"mtlnovel": BACKEND_MTLNOVEL,
     u"epub": BACKEND_EPUB,
@@ -63,6 +74,8 @@ APP_BACKEND = {
     u"images": BACKEND_IMAGES,
     u"novelfull": BACKEND_NOVELFULL,
     u"email": BACKEND_EMAIL,
+    u"ranobelib": BACKEND_RANOBELIB,
+    u"apilnpdf": APP_LNPDF,
 }
 
 """Add Backend apps"""

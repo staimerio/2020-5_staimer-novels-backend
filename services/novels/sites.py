@@ -6,6 +6,8 @@ URL_NOVELFULL_CHAPTERS = app.apps['backend']['novelfull']['base_url'] + \
     app.apps['backend']['novelfull']['novels_chapters']
 URL_MTLNOVEL_CHAPTERS = app.apps['backend']['mtlnovel']['base_url'] + \
     app.apps['backend']['mtlnovel']['novels_chapters']
+URL_RANOBELIB_CHAPTERS = app.apps['backend']['ranobelib']['base_url'] + \
+    app.apps['backend']['ranobelib']['novels_chapters']
 
 
 def get_ur_chapters_from_site(site):
@@ -20,4 +22,6 @@ def get_ur_chapters_from_site(site):
         return URL_MTLNOVEL_CHAPTERS
     elif site == "frmtlnovelcom":
         return URL_MTLNOVEL_CHAPTERS
+    elif site == "ranobelibme":
+        return URL_RANOBELIB_CHAPTERS
     raise ValueError("Site {0} is invalid.".format(site))
