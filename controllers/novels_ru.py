@@ -30,7 +30,8 @@ def publish_latest(req: Request, res: Response, next: Next):
         req.param('limit_publish', WEBSITE_LIMIT_PUBLISH_LATEST, int),
         _lang['data']['language'],
         _lang.get('data'),
-        proxy_images=True
+        proxy_images=True,
+        encode_style=1,
     )
     """Check if exist an error"""
     if _created_posts['valid'] is False:

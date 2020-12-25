@@ -13,6 +13,7 @@ URL_BUILD_FROM_EPUB = app.apps['backend']['pdf']['base_url'] + \
 URL_BUILD_FROM_HTML = app.apps['backend']['pdf']['base_url'] + \
     app.apps['backend']['pdf']['build_from_html']
 
+
 def build_pdfs_from_epub(files, binary_response=False):
     """Build a pdf file from pdf file
 
@@ -22,7 +23,7 @@ def build_pdfs_from_epub(files, binary_response=False):
 
     """Prepare the payload"""
     _payload = {
-        
+
     }
     _params = {
         u"binary_response": binary_response
@@ -44,7 +45,7 @@ def build_pdfs_from_epub(files, binary_response=False):
     return _files_json
 
 
-def build_pdf_from_html(filename, cover, sections, prefix, binary_response=False, resources=[]):
+def build_pdf_from_html(filename, cover, sections, prefix, binary_response=False, resources=[], encode_style=0):
     """Build a pdf from html
 
     :param filename: Name of the file
@@ -62,6 +63,7 @@ def build_pdf_from_html(filename, cover, sections, prefix, binary_response=False
         u"sections": sections,
         u"prefix": prefix,
         u"resources": resources,
+        u"encode_style": encode_style,
     }
     _params = {
         u"binary_response": binary_response

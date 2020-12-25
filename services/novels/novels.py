@@ -108,7 +108,8 @@ def publish_novels_new(
     limit_publish,
     language,
     lang,
-    proxy_images=False
+    proxy_images=False,
+    encode_style=0
 ):
     """Get chapters from all novels"""
     _novels_chapters = get_chapters_by_novels(
@@ -151,7 +152,8 @@ def publish_novels_new(
     _build_pdf_books = build_all_items_to_pdf(
         _build_epub_books,
         # Set that the request to response with binary files
-        True
+        True,
+        encode_style
     )
 
     """Generate mobi for all novels"""
@@ -758,7 +760,7 @@ def get_by_id_db(novel):
     )
 
 
-def build_all_items_to_pdf(novels, binary_response):
+def build_all_items_to_pdf(novels, binary_response, encode_style):
     """Build all items to epub files
 
     :param items: List of items that you want to build to epub
@@ -783,6 +785,7 @@ def build_all_items_to_pdf(novels, binary_response):
             [_item],
             NOVEL_PREFIX_CH_EN,
             binary_response,
+            encode_style=encode_style
         )
 
         """Check if the response has any problem"""

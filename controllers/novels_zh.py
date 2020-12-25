@@ -25,11 +25,12 @@ def publish_latest(req: Request, res: Response, next: Next):
     """Get the langauge"""
     _lang = languages.get_language_hreflang_db("zh")
     """Publish novels"""
-    _created_posts = novels.publish_novels(
+    _created_posts = novels.publish_novels_new(
         _novels.get('novels'),
         req.param('limit_publish', WEBSITE_LIMIT_PUBLISH_LATEST, int),
         _lang['data']['language'],
-        _lang.get('data')
+        _lang.get('data'),
+        encode_style=2,
     )
     """Check if exist an error"""
     if _created_posts['valid'] is False:
