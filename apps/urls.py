@@ -59,6 +59,11 @@ BACKEND_RANOBELIB = {
     u"novels_latest": "/novels/latest",
     u"novels_chapters": "/novels/chapters",
 }
+BACKEND_NOVELLELEGGERE = {
+    u"base_url": app.config.get('APP_BACKEND_NOVELLELEGGERE'),
+    u"novels_latest": "/novels/latest",
+    u"novels_chapters": "/novels/chapters",
+}
 
 APP_LNPDF = {
     u"base_url": app.config.get('APP_APP_LNPDF'),
@@ -76,6 +81,7 @@ APP_BACKEND = {
     u"email": BACKEND_EMAIL,
     u"ranobelib": BACKEND_RANOBELIB,
     u"apilnpdf": APP_LNPDF,
+    u"novelleleggere": BACKEND_NOVELLELEGGERE,
 }
 
 """Add Backend apps"""

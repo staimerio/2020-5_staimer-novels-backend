@@ -8,6 +8,7 @@ import controllers.novels_id as novels_id
 import controllers.novels_fr as novels_fr
 import controllers.novels_zh as novels_zh
 import controllers.novels_ru as novels_ru
+import controllers.novels_it as novels_it
 import controllers.novels_requests as novels_requests
 import controllers.novels_chapters as novels_chapters
 import controllers.languages as languages
@@ -32,6 +33,9 @@ router.post("/novels/latest/zh", novels_zh.publish_latest)
 
 # Novels RU
 router.post("/novels/latest/ru", novels_ru.publish_latest)
+
+# Novels IT
+router.post("/novels/latest/it", novels_it.publish_latest)
 
 # Routes for requests
 router \
