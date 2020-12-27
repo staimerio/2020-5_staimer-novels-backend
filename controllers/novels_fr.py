@@ -25,7 +25,7 @@ def publish_latest(req: Request, res: Response, next: Next):
     """Get the langauge"""
     _lang = languages.get_language_hreflang_db("fr")
     """Publish novels"""
-    _created_posts = novels.publish_novels(
+    _created_posts = novels.publish_novels_new(
         _novels.get('novels'),
         req.param('limit_publish', WEBSITE_LIMIT_PUBLISH_LATEST, int),
         _lang['data']['language'],
