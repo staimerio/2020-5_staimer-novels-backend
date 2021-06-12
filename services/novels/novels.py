@@ -696,7 +696,7 @@ def get_chapters_by_novels(
         """Add novel to list"""
         _novels_chapters.append(_novel)
         """Check if is the max"""
-        if len(_novels_chapters) >= limit_publish:
+        if _novel['chapters'] and len(_novels_chapters) >= limit_publish:
             break
     return _novels_chapters
 
